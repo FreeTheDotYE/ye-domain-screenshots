@@ -1,0 +1,14 @@
+{
+  "attempted": 0,
+  "candidate_domains": 0,
+  "changed": 0,
+  "current_screenshots": 0,
+  "date": "",
+  "failed": 0,
+  "images": 0,
+  "schema_version": 1,
+  "successful": 0,
+  "total_observations": 0,
+  "unchanged": 0,
+  "vantage": "external-web"
+}
