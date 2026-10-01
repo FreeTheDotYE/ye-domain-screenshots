@@ -86,6 +86,43 @@ def digest_object(value: object) -> str:
     return digest_bytes(canonical_json(value).encode("utf-8"))
 
 
+JPEG_SOF_MARKERS = {
+    0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+    0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF,
+}
+
+
+def jpeg_dimensions(body: bytes) -> tuple[int, int]:
+    if len(body) < 11 or body[:2] != b"\xff\xd8":
+        raise ValueError("invalid JPEG header")
+    offset = 2
+    while offset + 3 < len(body):
+        while offset < len(body) and body[offset] != 0xFF:
+            offset += 1
+        while offset < len(body) and body[offset] == 0xFF:
+            offset += 1
+        if offset >= len(body):
+            break
+        marker = body[offset]
+        offset += 1
+        if marker in {0xD9, 0xDA}:
+            break
+        if marker == 0x01 or 0xD0 <= marker <= 0xD8:
+            continue
+        if offset + 2 > len(body):
+            break
+        length = int.from_bytes(body[offset:offset + 2], "big")
+        if length < 2 or offset + length > len(body):
+            break
+        if marker in JPEG_SOF_MARKERS and length >= 7:
+            height = int.from_bytes(body[offset + 3:offset + 5], "big")
+            width = int.from_bytes(body[offset + 5:offset + 7], "big")
+            if width and height:
+                return width, height
+        offset += length
+    raise ValueError("JPEG dimensions missing")
+
+
 def valid_date(value: object, *, allow_empty: bool = False) -> bool:
     if allow_empty and value == "":
         return True
@@ -164,8 +201,15 @@ def common_row(row: dict, keys: set[str], date_field: str) -> None:
         or match.group(2) != digest
     ):
         raise ValueError(f"invalid screenshot image reference for {domain}")
-    if row.get("width") != 1365 or row.get("height") != 768:
-        raise ValueError(f"unexpected screenshot viewport for {domain}")
+    width = row.get("width")
+    height = row.get("height")
+    if (
+        width != 1365
+        or not isinstance(height, int)
+        or isinstance(height, bool)
+        or not 768 <= height <= 65535
+    ):
+        raise ValueError(f"unexpected screenshot dimensions for {domain}")
     if not valid_date(row.get(date_field)):
         raise ValueError(f"invalid screenshot date for {domain}")
 
@@ -209,19 +253,27 @@ def validate_manifest(root: Path) -> None:
 
 def validate_images(root: Path, observations: list[dict]) -> set[str]:
     referenced = {row["image_path"] for row in observations}
+    expected_dimensions: dict[str, tuple[int, int]] = {}
+    for row in observations:
+        dimensions = (row["width"], row["height"])
+        prior = expected_dimensions.setdefault(row["image_path"], dimensions)
+        if prior != dimensions:
+            raise ValueError("conflicting dimensions for screenshot image")
     actual = set()
     for path in sorted((root / "images").rglob("*.jpg")) if (root / "images").exists() else []:
         relative = path.relative_to(root).as_posix()
         match = IMAGE_RE.fullmatch(relative)
         body = path.read_bytes()
-        if (
-            not match
-            or match.group(1) != match.group(2)[:2]
+        try:
+            dimensions = jpeg_dimensions(body)
+        except ValueError as error:
+            raise ValueError(f"invalid screenshot image: {relative}") from error
+        if not match or (
+            match.group(1) != match.group(2)[:2]
             or digest_bytes(body) != match.group(2)
-            or len(body) < 4
-            or not body.startswith(b"\xff\xd8\xff")
             or not body.endswith(b"\xff\xd9")
-            or len(body) > 2_500_000
+            or len(body) > 8_000_000
+            or dimensions != expected_dimensions.get(relative)
         ):
             raise ValueError(f"invalid screenshot image: {relative}")
         actual.add(relative)

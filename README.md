@@ -18,6 +18,12 @@ from an external network vantage on a recorded day?
 - `runs/latest.json` reports coverage for the latest bounded collection run.
 - `MANIFEST.sha256` covers every published file except the manifest itself.
 
+The current collector stores a full-page JPEG at a fixed 1365-pixel layout
+width and records the actual image height. Early 1365 x 768 viewport-only
+observations remain in append-only history; current rows are recaptured in the
+full-page format. The public ledger shows a cropped responsive preview that
+links to the complete content-addressed image.
+
 The collector revisits the public corpus incrementally and prioritizes names
 without a screenshot and names with newly confirmed DNS changes. Exact
 collection times and private operational diagnostics are not published.
@@ -32,8 +38,8 @@ traffic originating outside Yemen.
 
 Every current row records the domain, requested and final URL, HTTP status,
 content type, image digest and path, capture day, most recent successful check
-day, and the fixed viewport dimensions. Observation identifiers are SHA-256
-digests of their canonical public payload.
+day, fixed capture width, and actual full-page height. Observation identifiers
+are SHA-256 digests of their canonical public payload.
 
 All dates are UTC calendar dates. The data records observations, not inferred
 registration dates, ownership, or a complete service-availability history.
