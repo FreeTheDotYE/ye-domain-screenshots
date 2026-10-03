@@ -24,6 +24,12 @@ observations remain in append-only history; current rows are recaptured in the
 full-page format. The public ledger shows a cropped responsive preview that
 links to the complete content-addressed image.
 
+Some early captures contain missing Arabic glyphs or incompletely loaded page
+elements. New captures require Arabic font support and allow bounded time for
+fonts, ordinary page loading and offscreen content. Earlier images remain in
+the archive. A rendering improvement can change screenshot pixels without a
+corresponding change to the website. Page-owned overlays remain visible.
+
 The collector revisits the public corpus incrementally and prioritizes names
 without a screenshot and names with newly confirmed DNS changes. Exact
 collection times and private operational diagnostics are not published.
