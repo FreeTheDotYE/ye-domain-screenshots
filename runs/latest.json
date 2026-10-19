@@ -3,12 +3,12 @@
   "date": "2026-10-19",
   "candidate_domains": 1684,
   "attempted": 30,
-  "successful": 4,
-  "changed": 3,
-  "unchanged": 1,
-  "failed": 26,
-  "current_screenshots": 463,
+  "successful": 1,
+  "changed": 1,
+  "unchanged": 0,
+  "failed": 29,
+  "current_screenshots": 464,
   "images": 667,
-  "total_observations": 861,
+  "total_observations": 862,
   "vantage": "external-web"
 }
