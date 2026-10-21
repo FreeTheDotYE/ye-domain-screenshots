@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "date": "2026-10-20",
+  "date": "2026-10-21",
   "candidate_domains": 1686,
-  "attempted": 3,
-  "successful": 1,
-  "changed": 1,
-  "unchanged": 0,
-  "failed": 2,
+  "attempted": 30,
+  "successful": 24,
+  "changed": 17,
+  "unchanged": 7,
+  "failed": 6,
   "current_screenshots": 467,
-  "images": 682,
-  "total_observations": 878,
+  "images": 693,
+  "total_observations": 895,
   "vantage": "external-web"
 }
