@@ -4,11 +4,11 @@
   "candidate_domains": 1706,
   "attempted": 30,
   "successful": 7,
-  "changed": 4,
-  "unchanged": 3,
+  "changed": 3,
+  "unchanged": 4,
   "failed": 23,
   "current_screenshots": 483,
-  "images": 1075,
-  "total_observations": 1473,
+  "images": 1078,
+  "total_observations": 1476,
   "vantage": "external-web"
 }
